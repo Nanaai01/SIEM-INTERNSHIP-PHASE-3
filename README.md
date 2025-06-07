@@ -230,5 +230,3 @@ EDRs can be bypassed if they don’t inspect script content or memory execution.
 * Build timelines to visualize the attack chain.
 
 ---
-
-Let me know if you'd like this as a `.md` file or added into your repo directly!

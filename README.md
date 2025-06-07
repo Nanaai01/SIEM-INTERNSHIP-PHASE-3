@@ -1,5 +1,3 @@
-Here's a sample `README.md` post for **Phase 3** of your repository, written professionally and clearly for documentation on advanced attack scenarios:
-
 ---
 
 # 📁 Phase 3: Realistic & Critical Attack Scenarios

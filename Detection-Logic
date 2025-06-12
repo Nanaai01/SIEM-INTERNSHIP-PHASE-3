@@ -1,0 +1,44 @@
+
+### 1️⃣ 🔎 **All Failed RDP Logon Attempts (Event ID 4625 + LogonType 10)**
+
+```spl
+index=win_logs sourcetype="WinEventLog:Security" EventCode=4625 LogonType=10
+```
+
+---
+
+### 2️⃣ 🔎 **All Successful RDP Logon Attempts (Event ID 4624 + LogonType 10)**
+
+```spl
+index=win_logs sourcetype="WinEventLog:Security" EventCode=4624 LogonType=10
+```
+
+---
+
+### 3️⃣ 🔎 **Detect Brute Force Attempts (Failed Attempts >10 by same account or IP)**
+
+```spl
+index=win_logs sourcetype="WinEventLog:Security" EventCode=4625 LogonType=10
+| stats count by Account_Name, IpAddress
+| where count > 10
+```
+
+---
+
+### 4️⃣ 🔎 **Sysmon Network Connections to RDP Port 3389**
+
+```spl
+index=win_logs sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=3 DestinationPort=3389
+```
+
+---
+
+### 5️⃣ 🔎 **Correlate Successful Logon After Multiple Failures**
+
+```spl
+index=win_logs sourcetype="WinEventLog:Security" (EventCode=4625 OR EventCode=4624) LogonType=10
+| stats count(eval(EventCode=4625)) AS FailedLogons, count(eval(EventCode=4624)) AS SuccessLogons by Account_Name, IpAddress
+| where FailedLogons > 5 AND SuccessLogons > 0
+```
+
+---

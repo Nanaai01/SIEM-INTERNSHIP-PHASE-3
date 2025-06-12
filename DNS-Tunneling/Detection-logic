@@ -1,0 +1,51 @@
+
+### 🔎 **General DNS Query Logging (Sysmon Event ID 22)**
+
+```spl
+index=win_logs sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=22
+```
+
+---
+
+### 🔎 **Focus on Long DNS Queries (Suspicious Subdomains)**
+
+DNS tunneling often generates very long subdomain requests due to encoded data being stuffed into the DNS request.
+
+```spl
+index=win_logs sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=22
+| eval query_length=len(QueryName)
+| where query_length > 50
+| table _time, Computer, QueryName, query_length
+| sort - query_length
+```
+
+---
+
+### 🔎 **Filter Specifically for Your Lab Domain (tunnel.labdomain.com)**
+
+```spl
+index=win_logs sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=22
+| search QueryName="*tunnel.labdomain.com*"
+| table _time, Computer, QueryName
+```
+
+---
+
+### 🔎 **High Volume Queries per Host (Possible Tunneling Behavior)**
+
+```spl
+index=win_logs sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=22
+| stats count by Computer, QueryName
+| where count > 100
+| sort - count
+```
+
+---
+
+### 🔎 **Detect Base64-like Patterns in Subdomains (optional advanced)**
+
+```spl
+index=win_logs sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=22
+| regex QueryName="([A-Za-z0-9+/]{20,})"
+| table _time, Computer, QueryName
+```

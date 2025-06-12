@@ -1,0 +1,34 @@
+
+### 🔎 **Persistence via Registry Run Keys (Sysmon Event ID 13 — Registry Value Set)**
+
+```spl
+index=win_logs sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=13
+| search TargetObject="*\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\*"
+```
+
+---
+
+### 🔎 **Optional: include both Current User & Local Machine keys**
+
+```spl
+index=win_logs sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=13
+(TargetObject="*\\Microsoft\\Windows\\CurrentVersion\\Run\\*" OR TargetObject="*\\Microsoft\\Windows\\CurrentVersion\\RunOnce\\*")
+```
+
+---
+
+### 🔎 **To see exact command written into the registry**
+
+```spl
+index=win_logs sourcetype="XmlWinEventLog:Microsoft-Windows-Sysmon/Operational" EventCode=13
+(TargetObject="*\\Microsoft\\Windows\\CurrentVersion\\Run\\*" OR TargetObject="*\\Microsoft\\Windows\\CurrentVersion\\RunOnce\\*")
+| table _time ComputerName UserName TargetObject Details
+```
+
+---
+
+✅ **Explanation:**
+
+* `EventCode=13` — Sysmon logs any registry key value set.
+* `TargetObject` — shows which registry key was modified.
+* `Details` — shows the value written (typically the persistence payload).
